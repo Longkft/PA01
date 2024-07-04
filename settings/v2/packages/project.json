@@ -1,0 +1,25 @@
+{
+  "general": {
+    "designResolution": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  "physics": {
+    "collisionGroups": [
+      {
+        "index": 1,
+        "name": "cbi"
+      },
+      {
+        "index": 2,
+        "name": "item"
+      }
+    ],
+    "collisionMatrix": {
+      "0": 6,
+      "1": 5,
+      "2": 3
+    }
+  }
+}
