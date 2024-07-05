@@ -14,12 +14,22 @@
       {
         "index": 2,
         "name": "item"
+      },
+      {
+        "index": 3,
+        "name": "none"
+      },
+      {
+        "index": 4,
+        "name": "item_1"
       }
     ],
     "collisionMatrix": {
       "0": 6,
       "1": 5,
-      "2": 3
+      "2": 19,
+      "3": 0,
+      "4": 4
     }
   }
 }
