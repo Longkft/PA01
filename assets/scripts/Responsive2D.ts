@@ -368,18 +368,6 @@ export class Responsive2D extends Component {
         const scaleObj = { x: width * widthRatio / nodeTransform.width, y: height * heightRatio / nodeTransform.height }
         if (minMax == 1) {
             let scale = Math.min(scaleObj.x, scaleObj.y);
-            if (width < height && width / height > 0.7) {
-                // if (this.node.name === 'Baby' || this.node.name === 'Girl' || this.node.name === 'Mouse' || this.node.name === "Button_Play")
-                //     verSpace -= 3;
-                if (this.node.name === "Khung")
-                    scale *= 0.7;
-                if (this.node.name === "Color")
-                    scale *= 0.7;
-            }
-            else if (width > height && width / height < 1.67) {
-                if (this.node.name === "Tile" || this.node.name === 'BtnPlay')
-                    scale *= 0.8;
-            }
             scaleX = scale;
             scaleY = scale;
             changeEditorSliderCursorColor(this, 1, scaleObj);
@@ -399,15 +387,6 @@ export class Responsive2D extends Component {
         !flipY ? flipScalar.y = 1 : flipScalar.y = -1;
 
         node.setScale(new Vec3(scaleX * flipScalar.x, scaleY * flipScalar.y, node.scale.z));
-        if (node.name === 'BtnPlay') {
-            let ani = node.getComponent(AniBtnPlay);
-            let eff1 = tween()
-                .by(0.4, { scale: new Vec3(-0.05, -0.05, -0.05) }) // Thu nhỏ
-                .by(0.4, { scale: new Vec3(0.05, 0.05, 0.05) }) // Phóng to
-            if (ani.eff)
-                ani.eff.stop();
-            ani.eff = tween(node).repeatForever(eff1).start();// Bắt đầu tween
-        }
 
         const nodeDisplayWidth = nodeTransform.width * scaleX;
         const nodeDisplayHeight = nodeTransform.height * scaleY;
@@ -427,13 +406,6 @@ export class Responsive2D extends Component {
         if (alignment) {
             var hSpace;
             if (horizontalSpaceType == 1) {
-                if (this.node.name == 'BtnPlay') {
-                    if (width > height) {
-
-                    } else {
-
-                    }
-                }
                 hSpace = (horSpace * 0.01) * w;
             } else if (horizontalSpaceType == 2) {
                 hSpace = horSpace;

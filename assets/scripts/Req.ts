@@ -20,6 +20,10 @@ export class Req extends Component {
     _cbi: Node[] = [];
     _hold: Node[] = [];
     _item: Node[] = [];
+
+    _oneCbi: Node[] = [];
+    _otherCbi: Node[] = [];
+
     _woodNode: Node = null;
 }
 

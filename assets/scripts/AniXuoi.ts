@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, AnimationClip, find, log } from 'cc';
+import { _decorator, Component, Node, AnimationClip, find, log, director } from 'cc';
 import { Req } from './Req';
 const { ccclass, property } = _decorator;
 

@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Input, log, tween, Vec3, UITransform, RigidBody2D, PolygonCollider2D, ERigidBody2DType, HingeJoint2D } from 'cc';
+import { _decorator, Component, Node, Input, log, tween, Vec3, UITransform, RigidBody2D, PolygonCollider2D, ERigidBody2DType, HingeJoint2D, Vec2, warn, v2 } from 'cc';
 import { Req } from './Req';
 import { Wood } from './Wood';
 const { ccclass, property } = _decorator;
@@ -8,6 +8,7 @@ export class Hold extends Component {
 
     start() {
         this.registerTouch();
+        this.distribution();
     }
 
     update(deltaTime: number) {
@@ -54,6 +55,107 @@ export class Hold extends Component {
     }
 
     checkRigid() {
+        let oneCbi = Req.instance._oneCbi;
+        let otherCbi = Req.instance._otherCbi;
+
+        oneCbi.forEach(element => {
+            let listChild = element.children;
+            listChild.forEach((ele, i) => {
+                let name = ele.name;
+                let fildName = name.replace(/[0-9-]/g, '');
+                if (fildName === 'hold') {
+                    if (!this.isNodeCovered(ele)) {
+                        const rb = ele.parent.getComponent(RigidBody2D);
+                        if (rb) {
+                            const force = new Vec2(0, -1000); // Tăng giá trị Y để tăng lực rơi
+                            rb.applyForceToCenter(force, true);
+                            // ele.parent.getComponent(PolygonCollider2D).group = 16;
+                            rb.type = ERigidBody2DType.Dynamic;  // Thiết lập loại RigidBody
+                            rb.gravityScale = 10;
+                        }
+                    }
+                }
+            })
+        });
+
+        otherCbi.forEach(element => {
+            let listChild = element.children;
+
+            let countHold = 0;
+            let nodeLastCbi = null;
+            let nodeLast = null;
+            log('element: ', element)
+            listChild.forEach((ele, i) => {
+                let name = ele.name;
+                let filName = name.replace(/[0-9-]/g, '');
+
+                if (filName === 'hold') {
+                    // countHold++;
+                    if (!this.isNodeCovered(ele)) {
+                        // countHold--;
+                        log(false)
+                        // ele.parent.getComponent(PolygonCollider2D).group = 16;
+                        // ele.parent.getComponent(RigidBody2D).type = ERigidBody2DType.Dynamic;  // Thiết lập loại RigidBody
+                    } else {
+                        countHold++;
+                        nodeLastCbi = ele;
+                        nodeLast = element;
+                        log(true)
+                    }
+                }
+            });
+            log('countHold: ', countHold)
+
+            if (countHold === 0) {
+                const rb = element.getComponent(RigidBody2D);
+                if (rb) {
+                    const force = new Vec2(0, -1000); // Tăng giá trị Y để tăng lực rơi
+                    rb.applyForceToCenter(force, true);
+                    // ele.parent.getComponent(PolygonCollider2D).group = 16;
+                    rb.type = ERigidBody2DType.Dynamic;  // Thiết lập loại RigidBody
+                    rb.gravityScale = 10;
+                }  // Thiết lập loại RigidBody
+            } else if (countHold === 1) {
+                if (!nodeLast || !nodeLastCbi) {
+                    warn('Pivot or Pendulum nodes are not assigned!');
+                    return;
+                }
+
+                log('nodeLastCbi: ', nodeLastCbi);
+                log('nodeLast: ', nodeLast);
+                log('this.cbiLast: ', this.cbiLast);
+
+                // Thiết lập RigidBody2D cho nodeLastCbi (pivot)
+                let pivotBody = this.cbiLast.getComponent(RigidBody2D);
+                if (!pivotBody) {
+                    pivotBody = nodeLastCbi.addComponent(RigidBody2D);
+                }
+                pivotBody.type = ERigidBody2DType.Static; // Đảm bảo pivot là tĩnh
+
+                // Thiết lập RigidBody2D cho nodeLast (pendulum)
+                let pendulumBody = nodeLast.getComponent(RigidBody2D);
+                if (!pendulumBody) {
+                    pendulumBody = nodeLast.addComponent(RigidBody2D);
+                }
+                pendulumBody.type = ERigidBody2DType.Dynamic; // Đảm bảo pendulum là động
+
+                // Thiết lập HingeJoint2D cho nodeLast (pendulum)
+                let hingeJoint = nodeLast.getComponent(HingeJoint2D);
+                if (!hingeJoint) {
+                    hingeJoint = nodeLast.addComponent(HingeJoint2D);
+                }
+
+                hingeJoint.anchor = v2(0, 0); // Đặt điểm neo tại đỉnh của pendulum
+                hingeJoint.connectedAnchor = v2(0, 0); // Vị trí kết nối, tính từ trung tâm của pivot
+                hingeJoint.connectedBody = pivotBody; // Kết nối với pivot
+
+                // Tuỳ chỉnh các thuộc tính cho hành vi của con lắc
+                hingeJoint.enableMotor = false; // Tắt motor để con lắc dao động tự do
+            }
+        });
+    }
+
+    distribution() { // phân chia mảng
         let listItem = Req.instance._item;
 
         listItem.forEach((element, index) => {
@@ -69,78 +171,33 @@ export class Hold extends Component {
                 }
             });
 
+            // Sử dụng Set để lưu trữ các eParent đã gặp
+            // const eParentSet = new Set<Node>();
+
             listChild.forEach((ele, i) => {
                 let name = ele.name;
                 let filName = name.replace(/[0-9-]/g, '');
+                const eParent = ele.parent;
 
                 if (filName === 'hold') {
                     if (countHold === 1) {
-                        if (!this.isNodeCovered(ele)) {
-                            // ele.parent.getComponent(PolygonCollider2D).group = 16;
-                            ele.parent.getComponent(RigidBody2D).type = ERigidBody2DType.Dynamic;  // Thiết lập loại RigidBody
+                        const isDuplicate = Req.instance._oneCbi.some(node => node.name === eParent.name);
+                        if (!isDuplicate) {
+                            Req.instance._oneCbi.push(eParent);
                         }
                     } else if (countHold > 1) {
-                        const eParent = ele.parent
-                        const eleHinge = eParent.getComponent(HingeJoint2D);
-                        let arrayCbi = Req.instance._cbi;
-                        if (!eleHinge) {
-                            eParent.addComponent(HingeJoint2D);
-                        }
-
-                        let counCbi = 0;
-                        let nodeCbi: Node = null;
-                        // arrayCbi.forEach((eCbi, j) => {
-                        //     if (this.isOverlappingNoneposition(eParent, eCbi)) {
-                        //         counCbi++;
-                        //         nodeCbi = eCbi;
-                        //     }
-                        // });
-
-                        // log('counCbi: ', counCbi)
-                        // log('nodeCbi: ', nodeCbi)
-
-                        // if (counCbi === 1) {
-                        //     log(1)
-                        //     if (nodeCbi) {
-                        //         log(2)
-                        //         eParent.getComponent(HingeJoint2D).connectedBody = nodeCbi.getComponent(RigidBody2D);
-                        //     }
-                        // } else if (counCbi === 0) {
-                        //     log(3)
-                        //     eParent.getComponent(HingeJoint2D).connectedBody = null;
-                        //     eParent.getComponent(RigidBody2D).type = ERigidBody2DType.Dynamic;
-                        // }
-
-                        let countHold1 = 0;
-                        listChild.forEach((ele1, inx) => {
-                            let name = ele.name;
-                            let filName = name.replace(/[0-9-]/g, '');
-
-                            log('a')
-                            if (filName === 'hold') {
-                                log('b')
-                                countHold1++;
-                            }
-                        });
-                        log('countHold1: ', countHold1)
-
-                        if (countHold1 === 1) {
-                            log(1)
-                            if (nodeCbi) {
-                                log(2)
-                                eParent.getComponent(HingeJoint2D).connectedBody = nodeCbi.getComponent(RigidBody2D);
-                            }
-                        } else if (countHold1 === 0) {
-                            log(3)
-                            eParent.getComponent(HingeJoint2D).connectedBody = null;
-                            eParent.getComponent(RigidBody2D).type = ERigidBody2DType.Dynamic;
+                        // Kiểm tra xem tên của eParent đã có trong _otherCbi chưa
+                        const isDuplicate = Req.instance._otherCbi.some(node => node.name === eParent.name);
+                        if (!isDuplicate) {
+                            Req.instance._otherCbi.push(eParent);
                         }
                     }
                 }
-            })
+            });
         });
     }
 
+    cbiLast: Node = null;
     isNodeCovered(node: Node): boolean {
         let listHold = Req.instance._hold;
         let listCbi = Req.instance._cbi;
@@ -158,6 +215,7 @@ export class Hold extends Component {
             for (const middleNode of listCbi) {
                 if (this.isOverlapping(node, middleNode)) {
                     isCovered = true;
+                    this.cbiLast = middleNode;
                     continue;
                 }
             }
