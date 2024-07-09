@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Input, log, find, AnimationComponent, Vec3, tween } from 'cc';
+import { _decorator, Component, Node, Input, log, find, AnimationComponent, Vec3, tween, PolygonCollider2D } from 'cc';
 import { electron } from 'process';
 import { setFlagsFromString } from 'v8';
 import { AniXuoi } from './AniXuoi';
@@ -48,7 +48,6 @@ export class Wood extends Component {
                 // let ani = canVas.getComponent(AniXuoi).cbiXuoi;
                 this.playAni(this.node, 1)
                 this.tweenWood(this.node, -45);
-                log(1)
             } else {
                 this.checkMovingUp();
                 this.xuoi = true;
@@ -56,7 +55,6 @@ export class Wood extends Component {
                 this.playAni(this.node, 0);
                 this.tweenWood(this.node, 45);
                 Req.instance._woodNode = this.node;
-                log(2)
             }
         } else {
             return;
@@ -66,9 +64,7 @@ export class Wood extends Component {
     }
 
     onTouchEnd() {
-        // this.scheduleOnce(() => {
-        //     this.isTouch = false;
-        // }, this.elapsedTime);
+
     }
 
     playAni(node: Node, index: number) {
@@ -79,17 +75,6 @@ export class Wood extends Component {
 
     checkMovingUp(call?: CallableFunction) {
         let array = Req.instance._cbi;
-        // const game = find("Canvas/Game").children;
-
-        // game.forEach((element, index) => {
-        //     let name = element.name;
-        //     let filName = name.replace(/[0-9-]/g, '');
-        //     if (filName === 'cbi') {
-        //         array.push(element);
-        //     }
-        // });
-
-
 
         array.forEach((element, index) => {
             let isMVU = element.getComponent(Wood).isMovingUp;
@@ -101,11 +86,7 @@ export class Wood extends Component {
                 this.tweenWood(element, -45);
                 element.getComponent(Wood).isMovingDown = true;
                 element.getComponent(Wood).xuoi = false;
-                // this.xuoi = true;
-                log(3)
             } else {
-                // this.xuoi = false;
-                log(4)
                 return;
             }
         })
@@ -116,10 +97,11 @@ export class Wood extends Component {
     }
 
     tweenWood(node: Node, data: number) {
-
+        // node.getComponent(PolygonCollider2D).group = 8;
         tween(node).tag(1)
             .to(0.35, { position: new Vec3(node.position.x, node.position.y + data, node.position.z) })
             .call(() => {
+                // node.getComponent(PolygonCollider2D).group = 2;
             })
             .start();
     }

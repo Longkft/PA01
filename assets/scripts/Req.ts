@@ -25,5 +25,8 @@ export class Req extends Component {
     _otherCbi: Node[] = [];
 
     _woodNode: Node = null;
+
+    _countHoldCbiLast: Node = null;
+    _countHold: any = 0;
 }
 

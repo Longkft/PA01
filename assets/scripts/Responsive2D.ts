@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, CCFloat, Enum, view, UITransform, screen, find, Vec3, Canvas, tween } from 'cc';
+import { _decorator, Component, Node, CCFloat, Enum, view, UITransform, screen, find, Vec3, Canvas, tween, log } from 'cc';
 import { EDITOR } from 'cc/env';
 import { AniBtnPlay } from './AniBtnPlay';
 const { ccclass, property, disallowMultiple, executeInEditMode } = _decorator;
@@ -187,6 +187,9 @@ export class Responsive2D extends Component {
         const mostBottom = -h * 0.5;
         let width = w;
         let height = h;
+
+        // log('width: ', width, 'height: ', height);
+
         let left = mostLeft;
         let right = mostRight;
         let top = mostTop;
