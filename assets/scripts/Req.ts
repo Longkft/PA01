@@ -1,4 +1,4 @@
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component, Node, view, log } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('Req')
@@ -21,6 +21,10 @@ export class Req extends Component {
     _hold: Node[] = [];
     _item: Node[] = [];
 
+    _cbiRg: Node[] = [];
+    _holdRg: Node[] = [];
+    _itemRg: Node[] = [];
+
     _oneCbi: Node[] = [];
     _otherCbi: Node[] = [];
 
@@ -28,5 +32,11 @@ export class Req extends Component {
 
     _countHoldCbiLast: Node = null;
     _countHold: any = 0;
+
+    _flag: boolean = false;
+
+    _piece: number = 0;
+
+    _nodesToHandle1: Node[] = [];
 }
 
