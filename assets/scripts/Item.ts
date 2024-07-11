@@ -1,4 +1,5 @@
-import { _decorator, Component, Node, view, log } from 'cc';
+import { _decorator, Component, Node, view, log, find } from 'cc';
+import { AniXuoi } from './AniXuoi';
 import { Req } from './Req';
 const { ccclass, property } = _decorator;
 
@@ -11,7 +12,7 @@ export class Item extends Component {
     }
 
     update(deltaTime: number) {
-        this.checkIfFallingOffScreen(this.node)
+        this.checkIfFallingOffScreen(this.node);
     }
 
     hasFallenOffScreen: boolean = false;

@@ -30,7 +30,9 @@ export class Req extends Component {
 
     _woodNode: Node = null;
 
-    _countHoldCbiLast: Node = null;
+    _countHoldCbiLast: Node = null; // đếm còn bao nhiêu
+    _nodePrLast: Node = null; // lấy node của cha
+
     _countHold: any = 0;
 
     _flag: boolean = false;
@@ -38,5 +40,10 @@ export class Req extends Component {
     _piece: number = 0;
 
     _nodesToHandle1: Node[] = [];
+
+    _nodeInfo: { node: Node; countHold: number; nodeLastCbi: Node; nodeLast: Node }[] = [];
+    _nodeInfo1: { node: Node; dinh: Node }[] = [];
+
+    _endGame: boolean = false;
 }
 
